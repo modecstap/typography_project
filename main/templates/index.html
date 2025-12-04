@@ -1,8 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Главная{% endblock %}
 
 {% block content %}
-<h2>Добро пожаловать в нашу типографию!</h2>
-<p>Мы предлагаем печатные услуги высокого качества, каталог товаров и индивидуальные решения для вашего бизнеса.</p>
+<div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+    <img src="{% static 'img/logo.png' %}" height="250" width="250" alt="">
+    <h2>Добро пожаловать в нашу типографию!</h2>
+    <p>Мы предлагаем печатные услуги высокого качества, каталог товаров и индивидуальные решения для вашего бизнеса.</p>
+</div>
 {% endblock %}

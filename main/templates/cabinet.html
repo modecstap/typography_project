@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Личный кабинет</h1>
+    
+    <div class="row">
+        <!-- Боковая панель -->
+        <div class="col-md-3 mb-4">
+            <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action active">
+                    Мои заказы
+                </a>
+                <a href="#" class="list-group-item list-group-item-action">
+                    Выйти
+                </a>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="col-md-9">
+            <h2 class="h4 mb-3">Мои заказы</h2>
+
+            <!-- Заказ 1 -->
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Заказ #24578</strong>
+                        <span class="ms-3 text-muted">от 15.01.2024</span>
+                    </div>
+                    <span class="badge bg-success">Доставлен</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-8">
+                            <p class="mb-1"><strong>Сумма:</strong> 57 000 ₽</p>
+                            <p class="mb-1"><strong>Товары:</strong> Визитки (1000 шт.)</p>
+                        </div>
+                        <div class="col-4 text-end">
+                            <button class="btn btn-outline-primary btn-sm">Заказ завершён</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Заказ 2 -->
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Заказ #24579</strong>
+                        <span class="ms-3 text-muted">от 20.01.2024</span>
+                    </div>
+                    <span class="badge bg-warning">В обработке</span>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-2">
+                        <div class="col-8">
+                            <p class="mb-1"><strong>Сумма:</strong> 32 500 ₽</p>
+                            <p class="mb-1"><strong>Товары:</strong> Брошюры на пружине (100 шт.)</p>
+                            <p class="mb-0 text-muted"><small>Ожидаемая дата готовности: 25.01.2024</small></p>
+                        </div>
+                        <div class="col-4 text-end">
+                            <button class="btn btn-outline-secondary btn-sm" disabled>Ожидает подтверждения</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Статусы заказов -->
+            <div class="mt-4">
+                <h5 class="mb-3">Статусы заказов</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-secondary">Новый</span>
+                    <span class="badge bg-warning">В обработке</span>
+                    <span class="badge bg-info">В производстве</span>
+                    <span class="badge bg-primary">Готов к выдаче</span>
+                    <span class="badge bg-success">Доставлен</span>
+                    <span class="badge bg-danger">Отменён</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

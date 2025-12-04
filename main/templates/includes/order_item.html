@@ -1,0 +1,30 @@
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <strong>Заказ #{{ order.number }}</strong>
+            <span class="ms-3 text-muted">от {{ order.date }}</span>
+        </div>
+        <span class="badge bg-{{ order.status_color }}">{{ order.status_label }}</span>
+    </div>
+
+    <div class="card-body">
+        <div class="row mb-2">
+            <div class="col-8">
+                <p class="mb-1"><strong>Сумма:</strong> {{ order.amount }} ₽</p>
+                <p class="mb-1"><strong>Товары:</strong> {{ order.items }}</p>
+
+                {% if order.expected %}
+                <p class="mb-0 text-muted">
+                    <small>Ожидаемая дата готовности: {{ order.expected }}</small>
+                </p>
+                {% endif %}
+            </div>
+
+            <div class="col-4 text-end">
+                <button class="btn btn-outline-secondary btn-sm" disabled>
+                    {{ order.action_label }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -3,6 +3,109 @@
 {% block title %}{{ product.title }}{% endblock %}
 
 {% block content %}
-<h2>{{ product.title }}</h2>
-<p>{{product.description}}</p>
+<div class="container mt-4">
+    <div class="row">
+        <!-- Картинки с примерами -->
+        <div class="col-md-6">
+            <!-- Основное изображение -->
+            {% if product.image %}
+            <img src="{{ product.image.url }}"
+                 class="img-fluid rounded shadow-sm mb-3"
+                 alt="{{ product.title }}"
+                 style="max-height: 400px; object-fit: contain; width: 100%;">
+            {% endif %}
+
+            <!-- Дополнительные изображения -->
+            {% if product.images.all %}
+            <div class="row g-2">
+                {% for image in product.images.all|slice:":4" %}
+                <div class="col-3">
+                    <img src="{{ image.image.url }}"
+                         class="img-thumbnail w-100"
+                         alt="{{ image.alt_text }}"
+                         style="height: 80px; object-fit: cover;">
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Основная информация -->
+        <div class="col-md-6">
+            <h1 class="h2 mb-3">{{ product.title }}</h1>
+
+            <!-- Цена -->
+            <div class="mb-4">
+                <span class="fs-3 fw-bold text-danger">{{ product.price }} ₽</span>
+                {% if product.in_stock %}
+                <span class="badge bg-success ms-2">В наличии</span>
+                <small class="text-muted d-block">Осталось: {{ product.quantity }} шт.</small>
+                {% else %}
+                <span class="badge bg-danger ms-2">Нет в наличии</span>
+                {% endif %}
+            </div>
+
+            <!-- Описание -->
+            <div class="mb-4">
+                <h5 class="mb-2">Описание</h5>
+                <p class="text-muted">{{ product.description|linebreaks }}</p>
+            </div>
+
+            <!-- Кнопка корзины -->
+            {% if product.in_stock %}
+            <div class="d-grid gap-2 d-md-block mb-4">
+                <button class="btn btn-primary btn-lg px-5" onclick="addToCart({{ product.id }})">
+                    Купить
+                </button>
+            </div>
+            {% else %}
+            <button class="btn btn-secondary btn-lg px-5" disabled>
+                Нет в наличии
+            </button>
+            {% endif %}
+
+            <!-- Отзывы -->
+            {% if product.reviews.all %}
+            <div class="mt-5">
+                <h5 class="mb-3">Отзывы ({{ product.reviews.count }})</h5>
+
+                {% for review in product.reviews.all %}
+                <div class="border-start border-3 border-primary ps-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong>{{ review.author }}</strong>
+                        <small class="text-muted">{{ review.created_at }}</small>
+                    </div>
+
+                    <!-- Рейтинг -->
+                    <div class="text-warning mb-2">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <p class="mb-0">{{ review.text }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="mt-5">
+                <h5 class="mb-3">Отзывы</h5>
+                <p class="text-muted">Отзывов пока нет</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function addToCart(productId) {
+    // Логика добавления в корзину
+    alert('Товар добавлен в корзину!');
+    console.log('Добавить в корзину: ' + productId);
+}
+</script>
 {% endblock %}
