@@ -1,7 +1,8 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect
+from django.contrib.auth import login as auth_login, logout as auth_logout, update_session_auth_hash
 
-from main.models import Customer, Order, Product
+from main.forms import CorporateRegisterForm, CorporateLoginForm, CorporatePasswordChangeForm
+from main.models import Order
 
 products = [
     {
@@ -136,10 +137,6 @@ def about_page(request):
 def catalog_page(request):
     return render(request, "catalog.html", {"products": products})
 
-def cabinet_page(request):
-    return render(request, "cabinet.html")
-
-
 def product_page(request, product_id):
     product_data = next((p.copy() for p in products if p["id"] == product_id), None)
 
@@ -163,3 +160,57 @@ def product_page(request, product_id):
     })()
 
     return render(request, "product.html", {"product": product_data})
+
+
+def cabinet_page(request):
+    section = request.GET.get("section", "orders")
+    form = None
+    success = False
+    user = request.user if request.user.is_authenticated else None
+    orders = []
+
+    if user and user.is_authenticated:
+        orders = Order.objects.filter(user=user).order_by('-order_date')
+
+    if request.method == "POST":
+        if section == "register":
+            form = CorporateRegisterForm(request.POST)
+            if form.is_valid():
+                user = form.save()
+                return redirect("/cabinet?section=login")
+
+        elif section == "login":
+            form = CorporateLoginForm(request.POST)
+            if form.is_valid():
+                user = form.get_user()
+                auth_login(request, user)
+                return redirect("/cabinet?section=orders")
+
+        elif section == "change_password" and user:
+            form = CorporatePasswordChangeForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                update_session_auth_hash(request, form.user)
+                success = True
+            else:
+                print("Ошибка смены пароля:", form.errors)
+
+    else:
+        if section == "register":
+            form = CorporateRegisterForm()
+        elif section == "login":
+            form = CorporateLoginForm()
+        elif section == "change_password" and user:
+            form = CorporatePasswordChangeForm(user)
+
+    return render(request, "cabinet.html", {
+        "section": section,
+        "form": form,
+        "success": success,
+        "user": user,
+        "orders": orders
+    })
+
+def logout_view(request):
+    auth_logout(request)
+    return redirect("/cabinet?section=login")

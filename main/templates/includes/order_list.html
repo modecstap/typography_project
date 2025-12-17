@@ -1,0 +1,42 @@
+{% if orders %}
+    <h3>Мои заказы</h3>
+    {% for order in orders %}
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Заказ #{{ order.order_number }}</strong>
+                </div>
+                <span class="badge {{ order.status_class }}">{{ order.status_display }}</span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-2">
+                    <div class="col-8">
+                        <p class="mb-1"><strong>Сумма:</strong> {{ order.total_amount|floatformat:0 }} ₽</p>
+                        <p class="mb-1"><strong>Товары:</strong> {{ order.description }}</p>
+                    </div>
+                    <div class="col-4 text-end">
+                        {% if order.status == 'delivered' %}
+                            <button class="btn badge btn-sm bg-success">Доставлен</button>
+                        {% endif %}
+                        {% if order.status == 'in_progress' %}
+                            <button class="btn badge btn-sm bg-info">В производстве</button>
+                        {% endif %}
+                        {% if order.status == 'in_work' %}
+                            <button class="btn badge btn-sm bg-warning">В обработке</button>
+                        {% endif %}
+                        {% if order.status == 'done' %}
+                            <button class="btn badge btn-sm bg-primary">Готов</button>
+                        {% endif %}
+                        {% if order.status == 'canceled' %}
+                            <button class="btn badge btn-sm bg-danger">Отменён</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">
+        У вас пока нет заказов.
+    </div>
+{% endif %}
