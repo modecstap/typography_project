@@ -5,18 +5,19 @@
 {% block content %}
 <div class="container mt-4">
     <div class="row">
-        <!-- Картинки с примерами -->
-        <div class="col-md-6">
-            <!-- Основное изображение -->
-            {% if product.image %}
-            <img src="{{ product.image.url }}"
-                 class="img-fluid rounded shadow-sm mb-3"
-                 alt="{{ product.title }}"
-                 style="max-height: 400px; object-fit: contain; width: 100%;">
-            {% endif %}
 
-            <!-- Дополнительные изображения -->
-            {% if product.images.all %}
+        <!-- Картинки -->
+        <div class="col-md-6">
+            {% with main_image=product.images.first %}
+                {% if main_image %}
+                <img src="{{ main_image.image.url }}"
+                     class="img-fluid rounded shadow-sm mb-3"
+                     alt="{{ main_image.alt_text|default:product.title }}"
+                     style="max-height: 400px; object-fit: contain; width: 100%;">
+                {% endif %}
+            {% endwith %}
+
+            {% if product.images.exists %}
             <div class="row g-2">
                 {% for image in product.images.all|slice:":4" %}
                 <div class="col-3">
@@ -33,29 +34,24 @@
         <!-- Основная информация -->
         <div class="col-md-6">
             <h1 class="h2 mb-3">{{ product.title }}</h1>
-
-            <!-- Цена -->
             <div class="mb-4">
                 <span class="fs-3 fw-bold text-danger">{{ product.price }} ₽</span>
                 {% if product.in_stock %}
-                <span class="badge bg-success ms-2">В наличии</span>
-                <small class="text-muted d-block">Осталось: {{ product.quantity }} шт.</small>
+                    <span class="badge bg-success ms-2">В продаже</span>
                 {% else %}
-                <span class="badge bg-danger ms-2">Нет в наличии</span>
+                    <span class="badge bg-danger ms-2">Нет в продаже</span>
                 {% endif %}
             </div>
 
-            <!-- Описание -->
             <div class="mb-4">
                 <h5 class="mb-2">Описание</h5>
                 <p class="text-muted">{{ product.description|linebreaks }}</p>
             </div>
 
-            <!-- Кнопка корзины -->
             {% if product.in_stock %}
             <div class="d-grid gap-2 d-md-block mb-4">
-                <button class="btn btn-primary btn-lg px-5" onclick="addToCart({{ product.id }})">
-                    Купить
+                <button class="btn btn-primary btn-lg px-5" data-bs-toggle="modal" data-bs-target="#orderModal">
+                    Заказать
                 </button>
             </div>
             {% else %}
@@ -65,47 +61,108 @@
             {% endif %}
 
             <!-- Отзывы -->
-            {% if product.reviews.all %}
-            <div class="mt-5">
-                <h5 class="mb-3">Отзывы ({{ product.reviews.count }})</h5>
+            {% with reviews=product.reviews %}
+            <h5 class="mb-3">Отзывы ({{ reviews|length }})</h5>
 
-                {% for review in product.reviews.all %}
-                <div class="border-start border-3 border-primary ps-3 mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <strong>{{ review.author }}</strong>
-                        <small class="text-muted">{{ review.created_at }}</small>
+            {% if reviews %}
+                {% for review in reviews %}
+                    <div class="border-start border-3 border-primary ps-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong>{{ review.author.company_name }}</strong>
+                            <small class="text-muted">
+                                {{ review.created_at|date:"d.m.Y" }}
+                            </small>
+                        </div>
+
+                        <div class="text-warning mb-2">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}★{% else %}☆{% endif %}
+                            {% endfor %}
+                        </div>
+
+                        <p class="mb-0">{{ review.text }}</p>
                     </div>
-
-                    <!-- Рейтинг -->
-                    <div class="text-warning mb-2">
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= review.rating %}
-                                ★
-                            {% else %}
-                                ☆
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-
-                    <p class="mb-0">{{ review.text }}</p>
-                </div>
                 {% endfor %}
-            </div>
             {% else %}
-            <div class="mt-5">
-                <h5 class="mb-3">Отзывы</h5>
                 <p class="text-muted">Отзывов пока нет</p>
-            </div>
             {% endif %}
+            {% endwith %}
+
         </div>
     </div>
 </div>
 
+<!-- Модальное окно заказа -->
+<div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="orderForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="orderModalLabel">Оформить заказ</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Количество</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1">
+            </div>
+            <div class="mb-3">
+                <label for="comment" class="form-label">Комментарий к заказу</label>
+                <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-primary">Подтвердить заказ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
-function addToCart(productId) {
-    // Логика добавления в корзину
-    alert('Товар добавлен в корзину!');
-    console.log('Добавить в корзину: ' + productId);
+const productId = {{ product.id }};
+
+document.getElementById("orderForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const quantity = document.getElementById("quantity").value;
+    const comment = document.getElementById("comment").value;
+
+    fetch(`/order/create/${productId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCookie("csrftoken"),
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ quantity, comment })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert("Заказ создан! № " + data.order_number);
+            location.reload();
+        } else {
+            alert(data.error || "Ошибка при создании заказа");
+        }
+    });
+});
+
+// стандартная функция Django для CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 </script>
+
 {% endblock %}

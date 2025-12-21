@@ -6,15 +6,30 @@
 <div class="row row-cols-1 row-cols-md-3 g-4">
     {% for product in products %}
         <div class="col">
-            <a href="{% url 'product' product.id %}" class="text-decoration-none text-dark">
+            <a href="{% url 'product' product.slug %}"
+               class="text-decoration-none text-dark">
+
                 <div class="card h-100 shadow-sm">
                     <div class="card-body">
-                        <h5 class="card-title">{{ product.title }}</h5>
-                        <p class="card-text">{{ product.description|truncatewords:10 }}</p>
+                        <h5 class="card-title">
+                            {{ product.title }}
+                        </h5>
+
+                        <p class="card-text">
+                            {{ product.description|truncatewords:10 }}
+                        </p>
+
+                        {% if product.in_stock %}
+                            <span class="badge bg-success">В продаже</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Нет в продаже</span>
+                        {% endif %}
                     </div>
                 </div>
             </a>
         </div>
+    {% empty %}
+        <p>Товары отсутствуют</p>
     {% endfor %}
 </div>
 {% endblock %}

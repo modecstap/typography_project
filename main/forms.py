@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import PasswordChangeForm as DjangoPasswordChangeForm
-from .models import CorporateUser
+from .models import CorporateUser, Review
 
 
 class CorporateRegisterForm(UserCreationForm):
@@ -64,3 +64,12 @@ class CorporatePasswordChangeForm(DjangoPasswordChangeForm):
         label="Подтвердите новый пароль",
         widget=forms.PasswordInput(attrs={"class": "form-control"})
     )
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ("rating", "text")
+        widgets = {
+            "rating": forms.NumberInput(attrs={"min": 1, "max": 5}),
+            "text": forms.Textarea(attrs={"rows": 3}),
+        }
