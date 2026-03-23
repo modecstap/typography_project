@@ -1,3 +1,4 @@
+# from better_profanity import profanity
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -73,3 +74,15 @@ class ReviewForm(forms.ModelForm):
             "rating": forms.NumberInput(attrs={"min": 1, "max": 5}),
             "text": forms.Textarea(attrs={"rows": 3}),
         }
+
+    # def clean_text(self):
+        # text = self.cleaned_data.get("text", "")
+        #
+        # profanity.load_censor_words()
+        #
+        # if profanity.contains_profanity(text):
+        #     raise forms.ValidationError(
+        #         "Отзыв содержит недопустимые выражения."
+        #     )
+        #
+        # return text

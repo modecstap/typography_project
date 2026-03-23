@@ -25,4 +25,4 @@ def add_review(request, item_id):
             review.author = request.user
             review.save()
 
-    return redirect("orders")
+    return redirect("cabinet")
