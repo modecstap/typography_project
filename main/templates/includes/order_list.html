@@ -10,68 +10,41 @@
         <div>
             <strong>Заказ #{{ order.order_number }}</strong>
         </div>
-
         <div class="col-4 text-end">
-
             {% if order.status == 'delivered' %}
                 <button class="btn badge btn-sm bg-success">Доставлен</button>
-
             {% elif order.status == 'processing' %}
                 <button class="btn badge btn-sm bg-info">В производстве</button>
-
             {% elif order.status == 'in_work' %}
                 <button class="btn badge btn-sm bg-warning">В обработке</button>
-
             {% elif order.status == 'done' %}
                 <button class="btn badge btn-sm bg-primary">Готов</button>
-
             {% elif order.status == 'canceled' %}
                 <button class="btn badge btn-sm bg-danger">Отменён</button>
-
             {% endif %}
-
         </div>
     </div>
-
-
     <div class="card-body">
-
         <p>
             <strong>Сумма:</strong>
             {{ order.total_amount|floatformat:0 }} ₽
         </p>
-
-
         <p><strong>Товары:</strong></p>
-
         <ul>
-
         {% for item in order.items.all %}
-
             <li>
-
                 {{ item.product.title }}
-                —
                 {{ item.quantity }} шт ×
                 {{ item.price|floatformat:0 }} ₽
-
-
                 {% if order.status == 'delivered' %}
-
                     {% if item.review %}
-
                         <div class="mt-1">
-
                             <span class="badge bg-success">
                                 {{ item.review.rating }}/5
                             </span>
-
                             {{ item.review.text }}
-
                         </div>
-
                     {% else %}
-
                         <button
                             class="btn btn-sm btn-outline-primary mt-1"
                             data-bs-toggle="modal"
@@ -81,76 +54,48 @@
                         >
                             Оставить отзыв
                         </button>
-
                     {% endif %}
-
                 {% endif %}
-
             </li>
-
         {% endfor %}
-
         </ul>
-
-
         {% if order.description %}
             <p>
                 <strong>Комментарий:</strong>
                 {{ order.description }}
             </p>
         {% endif %}
-
     </div>
-
 </div>
 {% endfor %}
-
 {% else %}
-
 <div class="alert alert-info">
     У вас пока нет заказов.
 </div>
-
 {% endif %}
 
 
 <div class="modal fade" id="reviewModal" tabindex="-1">
-
     <div class="modal-dialog modal-dialog-centered">
-
         <div class="modal-content">
-
-
             <form method="post" id="reviewForm" action="">
-
                 {% csrf_token %}
-
                 <div class="modal-header">
-
                     <h5 class="modal-title">
                         Оставить отзыв
                     </h5>
-
                     <button
                         type="button"
                         class="btn-close"
                         data-bs-dismiss="modal">
                     </button>
-
                 </div>
-
-
                 <div class="modal-body">
-
                     <p>
                         <strong id="reviewProductTitle"></strong>
                     </p>
-
-
                     <div class="mb-3">
-
                         <label>Оценка</label>
-
                         <input
                             type="number"
                             name="rating"
@@ -159,28 +104,18 @@
                             max="5"
                             required
                         >
-
                     </div>
-
-
                     <div class="mb-3">
-
                         <label>Комментарий</label>
-
                         <textarea
                             name="text"
                             class="form-control"
                             rows="3"
                             required
                         ></textarea>
-
                     </div>
-
                 </div>
-
-
                 <div class="modal-footer">
-
                     <button
                         type="button"
                         class="btn btn-secondary"
@@ -188,28 +123,17 @@
                     >
                         Отмена
                     </button>
-
                     <button
                         type="submit"
                         class="btn btn-primary"
                     >
                         Отправить
                     </button>
-
                 </div>
-
             </form>
-
-
         </div>
-
     </div>
-
 </div>
-
-
-
-<!-- ===== URL TEMPLATE ===== -->
 
 <script>
     const reviewUrlTemplate = "{% url 'add_review' 0 %}";
