@@ -1,4 +1,6 @@
-# from better_profanity import profanity
+from pathlib import Path
+
+from better_profanity import profanity
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm
@@ -66,6 +68,17 @@ class CorporatePasswordChangeForm(DjangoPasswordChangeForm):
         widget=forms.PasswordInput(attrs={"class": "form-control"})
     )
 
+def load_bad_words():
+    file_path = Path("ru_profane_words.txt")
+
+    if not file_path.exists():
+        return []
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        words = [w.strip() for w in f.readlines() if w.strip()]
+
+    return words
+
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
@@ -75,14 +88,14 @@ class ReviewForm(forms.ModelForm):
             "text": forms.Textarea(attrs={"rows": 3}),
         }
 
-    # def clean_text(self):
-        # text = self.cleaned_data.get("text", "")
-        #
-        # profanity.load_censor_words()
-        #
-        # if profanity.contains_profanity(text):
-        #     raise forms.ValidationError(
-        #         "Отзыв содержит недопустимые выражения."
-        #     )
-        #
-        # return text
+    def clean_text(self):
+        text = self.cleaned_data.get("text", "")
+
+        profanity.load_censor_words(load_bad_words())
+
+        if profanity.contains_profanity(text):
+            raise forms.ValidationError(
+                "Отзыв содержит недопустимые выражения."
+            )
+
+        return text
